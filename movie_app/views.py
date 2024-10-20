@@ -2,7 +2,8 @@ from django.db.models import Count
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from movie_app.models import Director, Movie, Review
-from movie_app.serializers import DirectorSerializer, MovieSerializer, ReviewSerializer, MovieWithReviewsSerializer
+from movie_app.serializers import (DirectorSerializer, MovieSerializer, ReviewSerializer, MovieWithReviewsSerializer,
+                                   DirectorValidateSerializer, MovieValidateSerializer, ReviewValidateSerializer)
 from rest_framework import status
 
 
@@ -13,7 +14,11 @@ def director_list_create_api_view(request):
         data = DirectorSerializer(instance=directors, many=True).data
         return Response(data=data)
     elif request.method == 'POST':
-        name = request.data.get('name')
+        serializer = DirectorSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data=serializer.errors)
+        name = serializer.validated_data.get('name')
 
         director = Director.objects.create(
             name=name
@@ -35,7 +40,11 @@ def director_detail_api_view(request, id):
         data = DirectorSerializer(instance=director, many=False).data
         return Response(data=data)
     elif request.method == 'PUT':
-        director.name = request.data.get('name')
+        serializer = DirectorSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data=serializer.errors)
+        director.name = serializer.validated_data.get('name')
         director.save()
         return Response(data=DirectorSerializer(director).data,
                         status=status.HTTP_201_CREATED)
@@ -51,10 +60,15 @@ def movie_list_create_api_view(request):
         data = MovieSerializer(instance=movie, many=True).data
         return Response(data=data)
     elif request.method == 'POST':
-        title = request.data.get('title')
-        description = request.data.get('description')
-        duration = request.data.get('duration')
-        director_id = request.data.get('director_id')
+        serializer = MovieValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data=serializer.errors)
+
+        title = serializer.validated_data.get('title')
+        description = serializer.validated_data.get('description')
+        duration = serializer.validated_data.get('duration')
+        director_id = serializer.validated_data.get('director_id')
 
         try:
             director = Director.objects.get(id=director_id)
@@ -85,10 +99,15 @@ def movie_detail_api_view(request, id):
         data = MovieSerializer(instance=movie, many=False).data
         return Response(data=data)
     elif request.method == 'PUT':
-        movie.title = request.data.get('title')
-        movie.description = request.data.get('description')
-        movie.duration = request.data.get('duration')
-        movie.director_id = request.data.get('director_id')
+        serializer = MovieValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data=serializer.errors)
+
+        movie.title = serializer.validated_data.get('title')
+        movie.description = serializer.validated_data.get('description')
+        movie.duration = serializer.validated_data.get('duration')
+        movie.director_id = serializer.validated_data.get('director_id')
         movie.save()
         return Response(data=MovieSerializer(movie).data,
                         status=status.HTTP_201_CREATED)
@@ -104,9 +123,14 @@ def review_list_create_api_view(request):
         data = ReviewSerializer(instance=review, many=True).data
         return Response(data=data)
     elif request.method == 'POST':
-        text = request.data.get('text')
-        stars = request.data.get('stars')
-        movie_id = request.data.get('movie_id')
+        serializer = ReviewValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data=serializer.errors)
+
+        text = serializer.validated_data.get('text')
+        stars = serializer.validated_data.get('stars')
+        movie_id = serializer.validated_data.get('movie_id')
 
         try:
             movie = Movie.objects.get(id=movie_id)
@@ -136,9 +160,14 @@ def review_detail_api_view(request, id):
         data = ReviewSerializer(instance=review, many=False).data
         return Response(data=data)
     elif request.method == 'PUT':
-        review.text = request.data.get('text')
-        review.stars = request.data.get('stars')
-        review.movie_id = request.data.get('movie_id')
+        serializer = MovieValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data=serializer.errors)
+
+        review.text = serializer.validated_data.get('text')
+        review.stars = serializer.validated_data.get('stars')
+        review.movie_id = serializer.validated_data.get('movie_id')
         review.save()
         return Response(data=ReviewSerializer(review).data,
                         status=status.HTTP_201_CREATED)
