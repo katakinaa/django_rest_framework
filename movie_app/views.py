@@ -1,5 +1,6 @@
 from django.db.models import Count
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from movie_app.models import Director, Movie, Review
 from movie_app.serializers import (DirectorSerializer, MovieSerializer, ReviewSerializer, MovieWithReviewsSerializer,
@@ -8,6 +9,7 @@ from rest_framework import status
 
 
 @api_view(http_method_names=['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def director_list_create_api_view(request):
     if request.method == 'GET':
         directors = Director.objects.annotate(movies_count=Count('movie'))
@@ -54,6 +56,7 @@ def director_detail_api_view(request, id):
 
 
 @api_view(http_method_names=['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def movie_list_create_api_view(request):
     if request.method == 'GET':
         movie = Movie.objects.all()
@@ -117,6 +120,7 @@ def movie_detail_api_view(request, id):
 
 
 @api_view(http_method_names=['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def review_list_create_api_view(request):
     if request.method == 'GET':
         review = Review.objects.all()
