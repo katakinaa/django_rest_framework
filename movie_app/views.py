@@ -6,6 +6,44 @@ from movie_app.models import Director, Movie, Review
 from movie_app.serializers import (DirectorSerializer, MovieSerializer, ReviewSerializer, MovieWithReviewsSerializer,
                                    DirectorValidateSerializer, MovieValidateSerializer, ReviewValidateSerializer)
 from rest_framework import status
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.pagination import PageNumberPagination
+
+
+class DirectorListAPIView(ListCreateAPIView):
+    queryset = Director.objects.all()
+    serializer_class = DirectorSerializer
+    pagination_class = PageNumberPagination
+
+
+class DirectorDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Director.objects.all()
+    serializer_class = DirectorSerializer
+    lookup_field = 'id'
+
+
+class MovieListAPIView(ListCreateAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
+    pagination_class = PageNumberPagination
+
+
+class MovieDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
+    lookup_field = 'id'
+
+
+class ReviewListAPIView(ListCreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    pagination_class = PageNumberPagination
+
+
+class ReviewDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    lookup_field = 'id'
 
 
 @api_view(http_method_names=['GET', 'POST'])
@@ -16,7 +54,7 @@ def director_list_create_api_view(request):
         data = DirectorSerializer(instance=directors, many=True).data
         return Response(data=data)
     elif request.method == 'POST':
-        serializer = DirectorSerializer(data=request.data)
+        serializer = DirectorValidateSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST,
                             data=serializer.errors)
@@ -42,7 +80,7 @@ def director_detail_api_view(request, id):
         data = DirectorSerializer(instance=director, many=False).data
         return Response(data=data)
     elif request.method == 'PUT':
-        serializer = DirectorSerializer(data=request.data)
+        serializer = DirectorValidateSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST,
                             data=serializer.errors)
