@@ -1,5 +1,6 @@
 from django.urls import path
 from movie_app import views
+from . import swagger
 
 urlpatterns = [
     path('directors/', views.DirectorListAPIView.as_view()),
@@ -10,3 +11,5 @@ urlpatterns = [
     path('reviews/<int:id>/', views.ReviewDetailAPIView.as_view()),
     path('movies/<int:id>/reviews/', views.movie_review_list_api_view),
 ]
+
+urlpatterns += swagger.urlpatterns
